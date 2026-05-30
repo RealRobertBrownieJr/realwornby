@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ListingsIdRouteImport } from './routes/listings.$id'
 
 const VerificationRoute = VerificationRouteImport.update({
   id: '/verification',
@@ -24,6 +26,11 @@ const VerificationRoute = VerificationRouteImport.update({
 const SellRoute = SellRouteImport.update({
   id: '/sell',
   path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MembershipRoute = MembershipRouteImport.update({
@@ -46,22 +53,31 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ListingsIdRoute = ListingsIdRouteImport.update({
+  id: '/listings/$id',
+  path: '/listings/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/membership': typeof MembershipRoute
+  '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
+  '/listings/$id': typeof ListingsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/membership': typeof MembershipRoute
+  '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
+  '/listings/$id': typeof ListingsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,8 +85,10 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/membership': typeof MembershipRoute
+  '/orders': typeof OrdersRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
+  '/listings/$id': typeof ListingsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -79,18 +97,30 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/membership'
+    | '/orders'
     | '/sell'
     | '/verification'
+    | '/listings/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/browse' | '/membership' | '/sell' | '/verification'
+  to:
+    | '/'
+    | '/auth'
+    | '/browse'
+    | '/membership'
+    | '/orders'
+    | '/sell'
+    | '/verification'
+    | '/listings/$id'
   id:
     | '__root__'
     | '/'
     | '/auth'
     | '/browse'
     | '/membership'
+    | '/orders'
     | '/sell'
     | '/verification'
+    | '/listings/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -98,8 +128,10 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrowseRoute: typeof BrowseRoute
   MembershipRoute: typeof MembershipRoute
+  OrdersRoute: typeof OrdersRoute
   SellRoute: typeof SellRoute
   VerificationRoute: typeof VerificationRoute
+  ListingsIdRoute: typeof ListingsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/sell'
       fullPath: '/sell'
       preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/membership': {
@@ -146,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/listings/$id': {
+      id: '/listings/$id'
+      path: '/listings/$id'
+      fullPath: '/listings/$id'
+      preLoaderRoute: typeof ListingsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -154,9 +200,21 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrowseRoute: BrowseRoute,
   MembershipRoute: MembershipRoute,
+  OrdersRoute: OrdersRoute,
   SellRoute: SellRoute,
   VerificationRoute: VerificationRoute,
+  ListingsIdRoute: ListingsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
