@@ -41,8 +41,8 @@ function OrdersPage() {
 
   if (loading || !user) return null;
 
-  async function update(id: string, patch: Record<string, any>) {
-    const { error } = await supabase.from("transactions").update(patch).eq("id", id);
+  async function update(id: string, patch: Record<string, unknown>) {
+    const { error } = await supabase.from("transactions").update(patch as any).eq("id", id);
     if (error) toast.error(error.message);
     else {
       toast.success("Updated");

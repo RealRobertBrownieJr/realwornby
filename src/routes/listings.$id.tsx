@@ -52,9 +52,10 @@ function ListingDetail() {
     );
   }
 
-  const isSeller = user?.id === listing.seller_id;
-  const sellerPremium = listing.profiles?.premium_until && new Date(listing.profiles.premium_until) > new Date();
-  const subtotal = listing.price_cents + (includeCustom ? listing.customization_fee_cents : 0);
+  const l: any = listing;
+  const isSeller = user?.id === l.seller_id;
+  const sellerPremium = l.profiles?.premium_until && new Date(l.profiles.premium_until) > new Date();
+  const subtotal = l.price_cents + (includeCustom ? l.customization_fee_cents : 0);
   const fee = sellerPremium ? 0 : Math.round(subtotal * 0.04);
   const total = subtotal + fee;
 
@@ -69,9 +70,9 @@ function ListingDetail() {
       const { data, error } = await supabase
         .from("transactions")
         .insert({
-          listing_id: listing.id,
+          listing_id: l.id,
           buyer_id: user.id,
-          seller_id: listing.seller_id,
+          seller_id: l.seller_id,
           amount_cents: total,
           fee_cents: fee,
           customization_notes: includeCustom && customNotes ? customNotes : null,
@@ -96,9 +97,9 @@ function ListingDetail() {
       <SiteNav />
       <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12">
         <div className="space-y-4">
-          {listing.images && listing.images.length > 0 ? (
-            listing.images.map((url: string) => (
-              <img key={url} src={url} alt={listing.title} className="w-full aspect-[3/4] object-cover" />
+          {l.images && l.images.length > 0 ? (
+            l.images.map((url: string) => (
+              <img key={url} src={url} alt={l.title} className="w-full aspect-[3/4] object-cover" />
             ))
           ) : (
             <div className="aspect-[3/4] bg-card" />
@@ -107,26 +108,26 @@ function ListingDetail() {
 
         <div>
           <div className="flex items-center gap-2 mb-3 text-[10px] uppercase tracking-[0.3em] text-foreground/40">
-            {listing.is_premium && <Sparkles className="size-3 text-accent" />}
-            {listing.region ?? "—"}
+            {l.is_premium && <Sparkles className="size-3 text-accent" />}
+            {l.region ?? "—"}
           </div>
-          <h1 className="font-serif text-5xl mb-4">{listing.title}</h1>
-          <p className="text-3xl font-serif mb-8">{price(listing.price_cents)}</p>
+          <h1 className="font-serif text-5xl mb-4">{l.title}</h1>
+          <p className="text-3xl font-serif mb-8">{price(l.price_cents)}</p>
 
-          {listing.description && (
+          {l.description && (
             <p className="text-sm leading-relaxed text-foreground/70 mb-8 whitespace-pre-wrap">
-              {listing.description}
+              {l.description}
             </p>
           )}
 
           <dl className="grid grid-cols-2 gap-4 mb-8 text-sm border-y border-border py-6">
-            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Fabric</dt><dd>{listing.fabric ?? "—"}</dd></div>
-            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Wear</dt><dd>{listing.wear_duration ?? "—"}</dd></div>
-            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Body type</dt><dd>{listing.body_type ?? "—"}</dd></div>
-            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Seller</dt><dd>{listing.profiles?.display_name ?? "Member"}</dd></div>
+            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Fabric</dt><dd>{l.fabric ?? "—"}</dd></div>
+            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Wear</dt><dd>{l.wear_duration ?? "—"}</dd></div>
+            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Body type</dt><dd>{l.body_type ?? "—"}</dd></div>
+            <div><dt className="text-[10px] uppercase tracking-widest text-foreground/40 mb-1">Seller</dt><dd>{l.profiles?.display_name ?? "Member"}</dd></div>
           </dl>
 
-          {listing.customizable && (
+          {l.customizable && (
             <div className="border border-border p-4 mb-6">
               <label className="flex items-start gap-3 text-sm cursor-pointer">
                 <input
@@ -138,7 +139,7 @@ function ListingDetail() {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <span>Add premium customization</span>
-                    <span className="font-serif">+{price(listing.customization_fee_cents)}</span>
+                    <span className="font-serif">+{price(l.customization_fee_cents)}</span>
                   </div>
                   {includeCustom && (
                     <textarea
@@ -166,13 +167,13 @@ function ListingDetail() {
           </div>
 
           <button
-            disabled={submitting || isSeller || listing.status !== "active"}
+            disabled={submitting || isSeller || l.status !== "active"}
             onClick={onBuy}
             className="w-full bg-primary text-primary-foreground py-4 text-sm uppercase tracking-widest hover:bg-primary/90 disabled:opacity-50"
           >
             {isSeller
               ? "This is your listing"
-              : listing.status !== "active"
+              : l.status !== "active"
               ? "No longer available"
               : submitting
               ? "Placing order…"
