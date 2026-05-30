@@ -14,6 +14,7 @@ import { Route as SellRouteImport } from './routes/sell'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as EscrowTermsRouteImport } from './routes/escrow-terms'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -43,6 +44,11 @@ const OrdersRoute = OrdersRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscrowTermsRoute = EscrowTermsRouteImport.update({
+  id: '/escrow-terms',
+  path: '/escrow-terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
+  '/escrow-terms': typeof EscrowTermsRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
   '/privacy': typeof PrivacyRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
+  '/escrow-terms': typeof EscrowTermsRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
   '/privacy': typeof PrivacyRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
   '/contact': typeof ContactRoute
+  '/escrow-terms': typeof EscrowTermsRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
   '/privacy': typeof PrivacyRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/contact'
+    | '/escrow-terms'
     | '/membership'
     | '/orders'
     | '/privacy'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/contact'
+    | '/escrow-terms'
     | '/membership'
     | '/orders'
     | '/privacy'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/browse'
     | '/contact'
+    | '/escrow-terms'
     | '/membership'
     | '/orders'
     | '/privacy'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BrowseRoute: typeof BrowseRoute
   ContactRoute: typeof ContactRoute
+  EscrowTermsRoute: typeof EscrowTermsRoute
   MembershipRoute: typeof MembershipRoute
   OrdersRoute: typeof OrdersRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MembershipRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/escrow-terms': {
+      id: '/escrow-terms'
+      path: '/escrow-terms'
+      fullPath: '/escrow-terms'
+      preLoaderRoute: typeof EscrowTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BrowseRoute: BrowseRoute,
   ContactRoute: ContactRoute,
+  EscrowTermsRoute: EscrowTermsRoute,
   MembershipRoute: MembershipRoute,
   OrdersRoute: OrdersRoute,
   PrivacyRoute: PrivacyRoute,
