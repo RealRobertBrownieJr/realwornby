@@ -9,10 +9,10 @@ export function SiteFooter() {
             Velvet &amp; Lace
           </Link>
           <div className="flex flex-wrap justify-center gap-8 md:gap-12 text-[11px] font-medium uppercase tracking-widest text-foreground/40">
-            <a href="#" className="hover:text-foreground">Privacy</a>
-            <a href="#" className="hover:text-foreground">Escrow Terms</a>
+            <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+            <Link to="/escrow-terms" className="hover:text-foreground">Escrow Terms</Link>
             <Link to="/verification" className="hover:text-foreground">Verification</Link>
-            <a href="#" className="hover:text-foreground">Contact</a>
+            <Link to="/contact" className="hover:text-foreground">Contact</Link>
           </div>
         </div>
         <div className="text-center text-[10px] font-medium uppercase tracking-[0.3em] text-foreground/20">
