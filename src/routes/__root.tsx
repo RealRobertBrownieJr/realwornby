@@ -79,13 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Velvet & Lace — Luxury Consignment Marketplace" },
+      { title: "WornBy — Used Panty Marketplace" },
       { name: "description", content: "A curated peer-to-peer marketplace for verified pre-owned luxury intimate apparel. Escrow-protected, discreetly delivered." },
-      { property: "og:title", content: "Velvet & Lace — Luxury Consignment Marketplace" },
-      { property: "og:description", content: "Verified sellers. Escrow protection. 48-hour release. The new standard of intimate exchange." },
+      { property: "og:title", content: "WornBy — Used Panty Marketplace" },
+      { property: "og:description", content: "A curated peer-to-peer marketplace for verified pre-owned luxury intimate apparel. Escrow-protected, discreetly delivered." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "WornBy — Used Panty Marketplace" },
+      { name: "twitter:description", content: "A curated peer-to-peer marketplace for verified pre-owned luxury intimate apparel. Escrow-protected, discreetly delivered." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/819a7739-fa75-4e7c-8e94-99eb6688b422/id-preview-cff357c6--17631c53-ee1c-4e24-ae00-d3161af380c8.lovable.app-1780173774479.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/819a7739-fa75-4e7c-8e94-99eb6688b422/id-preview-cff357c6--17631c53-ee1c-4e24-ae00-d3161af380c8.lovable.app-1780173774479.png" },
     ],
     links: [
       {
