@@ -55,11 +55,14 @@ function VerificationPage() {
       <section className="max-w-5xl mx-auto px-6 py-20 text-center">
         <h3 className="font-serif text-3xl lg:text-4xl mb-6">Ready to be seen?</h3>
         <Link
-          to="/membership"
+          to="/auth"
           className="inline-block bg-accent text-accent-foreground text-sm font-semibold py-3 px-8 ring-1 ring-accent hover:bg-primary hover:ring-primary transition-colors"
         >
           Start Verification
         </Link>
+        <p className="text-xs text-foreground/40 mt-4">
+          Create your account first — verification opens from your ledger.
+        </p>
       </section>
       <SiteFooter />
     </div>

@@ -96,8 +96,9 @@ function Index() {
         <div className="max-w-7xl mx-auto px-6 overflow-x-auto">
           <div className="flex space-x-10 py-5 whitespace-nowrap text-xs uppercase tracking-widest font-medium text-foreground/40">
             {categories.map((c, i) => (
-              <button
+              <Link
                 key={c}
+                to="/browse"
                 className={`pb-1 transition-colors ${
                   i === 0
                     ? "text-foreground border-b border-primary"
@@ -105,7 +106,7 @@ function Index() {
                 }`}
               >
                 {c}
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -200,10 +201,13 @@ function Index() {
                 </li>
               ))}
             </ul>
-            <button className="bg-accent text-accent-foreground text-sm font-semibold py-3 px-8 ring-1 ring-accent hover:bg-primary hover:ring-primary transition-colors inline-flex items-center gap-2">
+            <Link
+              to="/membership"
+              className="bg-accent text-accent-foreground text-sm font-semibold py-3 px-8 ring-1 ring-accent hover:bg-primary hover:ring-primary transition-colors inline-flex items-center gap-2"
+            >
               <Crown className="size-4" strokeWidth={1.5} />
               Join Premium — $199 / Year
-            </button>
+            </Link>
           </div>
           <div className="relative">
             <div className="w-full aspect-square rounded-full overflow-hidden ring-1 ring-border opacity-90">

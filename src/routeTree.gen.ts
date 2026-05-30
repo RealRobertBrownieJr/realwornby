@@ -11,8 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as MembershipRouteImport } from './routes/membership'
+import { Route as EscrowTermsRouteImport } from './routes/escrow-terms'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -28,6 +31,11 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -36,6 +44,16 @@ const OrdersRoute = OrdersRouteImport.update({
 const MembershipRoute = MembershipRouteImport.update({
   id: '/membership',
   path: '/membership',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscrowTermsRoute = EscrowTermsRouteImport.update({
+  id: '/escrow-terms',
+  path: '/escrow-terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BrowseRoute = BrowseRouteImport.update({
@@ -63,8 +81,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
+  '/contact': typeof ContactRoute
+  '/escrow-terms': typeof EscrowTermsRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -73,8 +94,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
+  '/contact': typeof ContactRoute
+  '/escrow-terms': typeof EscrowTermsRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -84,8 +108,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/browse': typeof BrowseRoute
+  '/contact': typeof ContactRoute
+  '/escrow-terms': typeof EscrowTermsRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -96,8 +123,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/browse'
+    | '/contact'
+    | '/escrow-terms'
     | '/membership'
     | '/orders'
+    | '/privacy'
     | '/sell'
     | '/verification'
     | '/listings/$id'
@@ -106,8 +136,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/browse'
+    | '/contact'
+    | '/escrow-terms'
     | '/membership'
     | '/orders'
+    | '/privacy'
     | '/sell'
     | '/verification'
     | '/listings/$id'
@@ -116,8 +149,11 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/browse'
+    | '/contact'
+    | '/escrow-terms'
     | '/membership'
     | '/orders'
+    | '/privacy'
     | '/sell'
     | '/verification'
     | '/listings/$id'
@@ -127,8 +163,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   BrowseRoute: typeof BrowseRoute
+  ContactRoute: typeof ContactRoute
+  EscrowTermsRoute: typeof EscrowTermsRoute
   MembershipRoute: typeof MembershipRoute
   OrdersRoute: typeof OrdersRoute
+  PrivacyRoute: typeof PrivacyRoute
   SellRoute: typeof SellRoute
   VerificationRoute: typeof VerificationRoute
   ListingsIdRoute: typeof ListingsIdRoute
@@ -150,6 +189,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/orders': {
       id: '/orders'
       path: '/orders'
@@ -162,6 +208,20 @@ declare module '@tanstack/react-router' {
       path: '/membership'
       fullPath: '/membership'
       preLoaderRoute: typeof MembershipRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/escrow-terms': {
+      id: '/escrow-terms'
+      path: '/escrow-terms'
+      fullPath: '/escrow-terms'
+      preLoaderRoute: typeof EscrowTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/browse': {
@@ -199,8 +259,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   BrowseRoute: BrowseRoute,
+  ContactRoute: ContactRoute,
+  EscrowTermsRoute: EscrowTermsRoute,
   MembershipRoute: MembershipRoute,
   OrdersRoute: OrdersRoute,
+  PrivacyRoute: PrivacyRoute,
   SellRoute: SellRoute,
   VerificationRoute: VerificationRoute,
   ListingsIdRoute: ListingsIdRoute,

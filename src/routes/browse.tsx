@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingCard } from "@/components/listing-card";
@@ -22,9 +24,13 @@ export const Route = createFileRoute("/browse")({
 function FilterGroup({
   title,
   options,
+  selected,
+  onToggle,
 }: {
   title: string;
   options: string[];
+  selected: Set<string>;
+  onToggle: (value: string) => void;
 }) {
   return (
     <section>
@@ -38,6 +44,8 @@ function FilterGroup({
               <input
                 type="checkbox"
                 className="size-3.5 border border-border bg-transparent accent-primary"
+                checked={selected.has(o)}
+                onChange={() => onToggle(o)}
               />
               {o}
             </label>
@@ -48,7 +56,29 @@ function FilterGroup({
   );
 }
 
+type SortKey = "premium" | "newest" | "price-asc" | "price-desc";
+
 function Browse() {
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortKey>("premium");
+  const [filters, setFilters] = useState<Record<string, Set<string>>>({
+    country: new Set(),
+    bodyType: new Set(),
+    fabric: new Set(),
+    wear: new Set(),
+    customizations: new Set(),
+  });
+
+  function toggle(group: keyof typeof filters, value: string) {
+    setFilters((prev) => {
+      const next = new Set(prev[group]);
+      next.has(value) ? next.delete(value) : next.add(value);
+      return { ...prev, [group]: next };
+    });
+  }
+
+  const activeCount = Object.values(filters).reduce((n, s) => n + s.size, 0);
+
   const { data: liveListings } = useQuery({
     queryKey: ["listings", "active"],
     queryFn: async (): Promise<Listing[]> => {
@@ -83,6 +113,31 @@ function Browse() {
   const items: Listing[] =
     liveListings && liveListings.length > 0 ? liveListings : seedListings;
 
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out = items.filter((l) => {
+      if (q) {
+        const hay = `${l.title} ${l.fabric} ${l.region} ${l.seller}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (filters.country.size && ![...filters.country].some((c) => l.region.toLowerCase().includes(c.toLowerCase()))) return false;
+      if (filters.bodyType.size && !filters.bodyType.has(l.bodyType)) return false;
+      if (filters.fabric.size && !filters.fabric.has(l.fabric)) return false;
+      if (filters.wear.size && !filters.wear.has(l.wear)) return false;
+      if (filters.customizations.size) {
+        const needsCustom = filters.customizations.has("Custom Alterations") || filters.customizations.has("Personal Requests");
+        if (needsCustom && !l.customizable) return false;
+      }
+      return true;
+    });
+    const sorted = [...out];
+    if (sort === "price-asc") sorted.sort((a, b) => a.price - b.price);
+    else if (sort === "price-desc") sorted.sort((a, b) => b.price - a.price);
+    else if (sort === "premium") sorted.sort((a, b) => Number(b.badge === "Premium Listing") - Number(a.badge === "Premium Listing"));
+    // "newest" relies on query order (already sorted by created_at desc server-side)
+    return sorted;
+  }, [items, query, filters, sort]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteNav />
@@ -101,12 +156,14 @@ function Browse() {
               <input
                 type="search"
                 placeholder="Search by brand, fabric, or seller…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="bg-transparent outline-none w-full text-sm placeholder:text-foreground/40"
               />
             </div>
             <button className="md:hidden flex items-center justify-center gap-2 border border-border px-4 py-3 text-xs uppercase tracking-widest">
               <SlidersHorizontal className="size-4" />
-              Filters
+              Filters{activeCount > 0 ? ` (${activeCount})` : ""}
             </button>
           </div>
         </div>
@@ -115,29 +172,43 @@ function Browse() {
       <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-12">
         {/* Filters */}
         <aside className="space-y-10">
+          {activeCount > 0 && (
+            <button
+              onClick={() => setFilters({ country: new Set(), bodyType: new Set(), fabric: new Set(), wear: new Set(), customizations: new Set() })}
+              className="text-[10px] uppercase tracking-widest text-primary hover:underline"
+            >
+              Clear all filters ({activeCount})
+            </button>
+          )}
           <FilterGroup
             title="Country"
             options={["United Kingdom", "France", "Italy", "Austria", "Japan", "United States"]}
-          />
-          <FilterGroup
-            title="Seller Age"
-            options={["18-24", "25-30", "31-35", "36-45", "45+"]}
+            selected={filters.country}
+            onToggle={(v) => toggle("country", v)}
           />
           <FilterGroup
             title="Body Type"
             options={["Petite", "Slim", "Hourglass", "Curvy", "Athletic"]}
+            selected={filters.bodyType}
+            onToggle={(v) => toggle("bodyType", v)}
           />
           <FilterGroup
             title="Fabric Type"
             options={["Silk Satin", "Chantilly Lace", "Leavers Lace", "Mulberry Silk", "Sheer Tulle"]}
+            selected={filters.fabric}
+            onToggle={(v) => toggle("fabric", v)}
           />
           <FilterGroup
             title="Wear Duration"
             options={["New with Tags", "1–4 Hours", "Half Day", "Full Day", "Multi-Day"]}
+            selected={filters.wear}
+            onToggle={(v) => toggle("wear", v)}
           />
           <FilterGroup
             title="Customizations"
             options={["Custom Alterations", "Personal Requests", "Photo Add-on", "Scented Wrap"]}
+            selected={filters.customizations}
+            onToggle={(v) => toggle("customizations", v)}
           />
 
           <div className="border border-accent/40 bg-accent/10 p-5">
@@ -147,9 +218,12 @@ function Browse() {
             <p className="text-[11px] leading-relaxed text-foreground/60 mb-4">
               Listings from Premium sellers are surfaced to the top of every filter set.
             </p>
-            <button className="w-full border border-accent py-2 text-[10px] uppercase tracking-widest hover:bg-accent transition-colors">
+            <Link
+              to="/membership"
+              className="block text-center w-full border border-accent py-2 text-[10px] uppercase tracking-widest hover:bg-accent transition-colors"
+            >
               Become a Member
-            </button>
+            </Link>
           </div>
         </aside>
 
@@ -157,20 +231,28 @@ function Browse() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <p className="text-sm text-foreground/60">
-              <span className="text-foreground font-semibold">{items.length}</span> verified pieces
+              <span className="text-foreground font-semibold">{filtered.length}</span> verified pieces
             </p>
-            <select className="bg-transparent border border-border px-3 py-2 text-xs uppercase tracking-widest text-foreground/70">
-              <option>Premium First</option>
-              <option>Newest</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              className="bg-transparent border border-border px-3 py-2 text-xs uppercase tracking-widest text-foreground/70"
+            >
+              <option value="premium">Premium First</option>
+              <option value="newest">Newest</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
             </select>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-16 gap-x-10">
-            {items.map((l) => (
-              <ListingCard key={l.id} listing={l} />
-            ))}
+            {filtered.length === 0 ? (
+              <p className="col-span-full text-center text-foreground/40 py-20 text-sm">
+                No pieces match your filters. Try clearing a few.
+              </p>
+            ) : (
+              filtered.map((l) => <ListingCard key={l.id} listing={l} />)
+            )}
           </div>
         </section>
       </div>
