@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { Check, Crown } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/membership")({
   head: () => ({
@@ -22,6 +24,7 @@ const tiers = [
     cadence: "Always",
     cta: "Open an Account",
     highlight: false,
+    action: "signup" as const,
     features: [
       "Free buyer & seller registration",
       "4% marketplace fee per sale",
@@ -36,6 +39,7 @@ const tiers = [
     cadence: "per year",
     cta: "Join Premium",
     highlight: true,
+    action: "premium" as const,
     features: [
       "Zero transaction fees — 4% waived all year",
       "Listings pushed to the front page",
@@ -48,6 +52,22 @@ const tiers = [
 ];
 
 function MembershipPage() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  function handleClick(action: "signup" | "premium") {
+    if (action === "signup") {
+      navigate({ to: user ? "/browse" : "/auth" });
+      return;
+    }
+    if (!user) {
+      toast.info("Sign in first, then upgrade to Premium.");
+      navigate({ to: "/auth" });
+      return;
+    }
+    toast.success("Premium checkout is coming soon — we'll email you the moment it's live.");
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteNav />
@@ -95,6 +115,7 @@ function MembershipPage() {
               ))}
             </ul>
             <button
+              onClick={() => handleClick(t.action)}
               className={`w-full py-3 text-sm font-semibold uppercase tracking-widest transition-colors ${
                 t.highlight
                   ? "bg-accent text-accent-foreground ring-1 ring-accent hover:bg-primary hover:ring-primary"
