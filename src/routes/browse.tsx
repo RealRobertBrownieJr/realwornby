@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { ListingCard } from "@/components/listing-card";
-import { listings } from "@/data/listings";
+import { listings as seedListings, type Listing } from "@/data/listings";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import { Search, SlidersHorizontal } from "lucide-react";
 
 export const Route = createFileRoute("/browse")({
@@ -47,6 +49,36 @@ function FilterGroup({
 }
 
 function Browse() {
+  const { data: liveListings } = useQuery({
+    queryKey: ["listings", "active"],
+    queryFn: async (): Promise<Listing[]> => {
+      const { data, error } = await supabase
+        .from("listings")
+        .select("id, title, price_cents, fabric, wear_duration, region, body_type, customizable, images, is_premium, profiles:seller_id(display_name)")
+        .eq("status", "active")
+        .order("is_premium", { ascending: false })
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((l: any) => ({
+        id: l.id,
+        title: l.title,
+        price: Math.round(l.price_cents / 100),
+        image: l.images?.[0] ?? seedListings[0].image,
+        wear: l.wear_duration ?? "—",
+        fabric: l.fabric ?? "—",
+        region: l.region ?? "—",
+        seller: l.profiles?.display_name ?? "Member",
+        badge: l.is_premium ? "Premium Listing" : "Verified",
+        customizable: l.customizable,
+        age: "",
+        bodyType: l.body_type ?? "",
+      }));
+    },
+  });
+
+  const items: Listing[] =
+    liveListings && liveListings.length > 0 ? liveListings : seedListings;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteNav />
@@ -121,7 +153,7 @@ function Browse() {
         <section>
           <div className="flex items-center justify-between mb-8">
             <p className="text-sm text-foreground/60">
-              <span className="text-foreground font-semibold">{listings.length}</span> verified pieces
+              <span className="text-foreground font-semibold">{items.length}</span> verified pieces
             </p>
             <select className="bg-transparent border border-border px-3 py-2 text-xs uppercase tracking-widest text-foreground/70">
               <option>Premium First</option>
@@ -132,7 +164,7 @@ function Browse() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-16 gap-x-10">
-            {listings.map((l) => (
+            {items.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
