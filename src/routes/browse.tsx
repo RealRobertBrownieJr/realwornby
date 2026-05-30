@@ -54,7 +54,7 @@ function Browse() {
     queryFn: async (): Promise<Listing[]> => {
       const { data, error } = await supabase
         .from("listings")
-        .select("id, title, price_cents, fabric, wear_duration, region, body_type, customizable, images, is_premium, profiles:seller_id(display_name)")
+        .select("id, title, price_cents, fabric, wear_duration, region, body_type, customizable, images, is_premium, profiles!listings_seller_profile_fk(display_name, verification)")
         .eq("status", "active")
         .order("is_premium", { ascending: false })
         .order("created_at", { ascending: false });
@@ -68,7 +68,11 @@ function Browse() {
         fabric: l.fabric ?? "—",
         region: l.region ?? "—",
         seller: l.profiles?.display_name ?? "Member",
-        badge: l.is_premium ? "Premium Listing" : "Verified",
+        badge: l.is_premium
+          ? "Premium Listing"
+          : l.profiles?.verification === "verified_plus"
+            ? "Verified Plus"
+            : "Verified",
         customizable: l.customizable,
         age: "",
         bodyType: l.body_type ?? "",

@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { toast } from "sonner";
+import { Upload, X } from "lucide-react";
 
 export const Route = createFileRoute("/sell")({
   head: () => ({
@@ -21,6 +22,9 @@ function SellPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [images, setImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -31,16 +35,43 @@ function SellPage() {
     body_type: BODY[0],
     customizable: false,
     customization_fee: "",
-    image_url: "",
   });
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [user, loading, navigate]);
 
+  async function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!user || !e.target.files?.length) return;
+    setUploading(true);
+    try {
+      const uploads = await Promise.all(
+        Array.from(e.target.files).map(async (file) => {
+          const ext = file.name.split(".").pop();
+          const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+          const { error } = await supabase.storage
+            .from("listing-images")
+            .upload(path, file, { upsert: false });
+          if (error) throw error;
+          return supabase.storage.from("listing-images").getPublicUrl(path).data.publicUrl;
+        }),
+      );
+      setImages((cur) => [...cur, ...uploads]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!user) return;
+    if (images.length === 0) {
+      toast.error("Add at least one photo");
+      return;
+    }
     setSubmitting(true);
     try {
       const price_cents = Math.round(parseFloat(form.price) * 100);
@@ -58,7 +89,7 @@ function SellPage() {
         customization_fee_cents: form.customizable && form.customization_fee
           ? Math.round(parseFloat(form.customization_fee) * 100)
           : 0,
-        images: form.image_url ? [form.image_url] : [],
+        images,
       });
       if (error) throw error;
       toast.success("Listing published.");
@@ -127,9 +158,28 @@ function SellPage() {
                 {BODY.map((o) => <option key={o}>{o}</option>)}
               </select>
             </div>
-            <div>
-              <label className={labelCls}>Image URL</label>
-              <input className={inputCls} type="url" placeholder="https://…" value={form.image_url} onChange={(e) => setField("image_url", e.target.value)} />
+          </div>
+
+          <div>
+            <label className={labelCls}>Photos</label>
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              {images.map((url) => (
+                <div key={url} className="relative aspect-square">
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImages((cur) => cur.filter((u) => u !== url))}
+                    className="absolute top-1 right-1 bg-background/80 backdrop-blur-sm p-1 rounded-full"
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              ))}
+              <label className="aspect-square border border-dashed border-border flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary text-foreground/40 hover:text-foreground/70 transition-colors">
+                <Upload className="size-5" />
+                <span className="text-[10px] uppercase tracking-widest">{uploading ? "…" : "Add"}</span>
+                <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={onUpload} disabled={uploading} />
+              </label>
             </div>
           </div>
 
