@@ -18,6 +18,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [accountType, setAccountType] = useState<"buyer" | "seller">("buyer");
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -36,11 +37,18 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { display_name: displayName || email.split("@")[0] },
+            data: {
+              display_name: displayName || email.split("@")[0],
+              account_type: accountType,
+            },
           },
         });
         if (error) throw error;
-        toast.success("Account created. Check your email to confirm.");
+        toast.success(
+          accountType === "seller"
+            ? "Seller account created. Check your email to confirm, then list your first piece."
+            : "Buyer account created. Check your email to confirm."
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -89,13 +97,41 @@ function AuthPage() {
 
         <form onSubmit={onSubmit} className="space-y-4">
           {mode === "signup" && (
-            <input
-              type="text"
-              placeholder="Display name"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-transparent border border-border px-4 py-3 text-sm outline-none focus:border-primary"
-            />
+            <>
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-foreground/40 block mb-2">
+                  I'm joining as
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["buyer", "seller"] as const).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setAccountType(t)}
+                      className={`border py-3 text-xs uppercase tracking-widest transition-colors ${
+                        accountType === t
+                          ? "border-primary bg-primary/10 text-foreground"
+                          : "border-border text-foreground/60 hover:text-foreground"
+                      }`}
+                    >
+                      {t === "buyer" ? "Buyer" : "Seller"}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[11px] text-foreground/40 mt-2 leading-relaxed">
+                  {accountType === "seller"
+                    ? "Sellers can list pieces and also purchase. Verification required before your first payout."
+                    : "Buyers can browse and purchase. You can upgrade to sell anytime from your profile."}
+                </p>
+              </div>
+              <input
+                type="text"
+                placeholder="Display name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full bg-transparent border border-border px-4 py-3 text-sm outline-none focus:border-primary"
+              />
+            </>
           )}
           <input
             type="email"
