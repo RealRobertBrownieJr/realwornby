@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -27,6 +28,11 @@ const VerificationRoute = VerificationRouteImport.update({
 const SellRoute = SellRouteImport.update({
   id: '/sell',
   path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrdersRoute = OrdersRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/membership': typeof MembershipRoute
   '/orders': typeof OrdersRoute
+  '/privacy': typeof PrivacyRoute
   '/sell': typeof SellRoute
   '/verification': typeof VerificationRoute
   '/listings/$id': typeof ListingsIdRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/membership'
     | '/orders'
+    | '/privacy'
     | '/sell'
     | '/verification'
     | '/listings/$id'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/membership'
     | '/orders'
+    | '/privacy'
     | '/sell'
     | '/verification'
     | '/listings/$id'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/membership'
     | '/orders'
+    | '/privacy'
     | '/sell'
     | '/verification'
     | '/listings/$id'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   MembershipRoute: typeof MembershipRoute
   OrdersRoute: typeof OrdersRoute
+  PrivacyRoute: typeof PrivacyRoute
   SellRoute: typeof SellRoute
   VerificationRoute: typeof VerificationRoute
   ListingsIdRoute: typeof ListingsIdRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/sell'
       fullPath: '/sell'
       preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/orders': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   MembershipRoute: MembershipRoute,
   OrdersRoute: OrdersRoute,
+  PrivacyRoute: PrivacyRoute,
   SellRoute: SellRoute,
   VerificationRoute: VerificationRoute,
   ListingsIdRoute: ListingsIdRoute,
