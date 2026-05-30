@@ -1,9 +1,21 @@
 import type { Listing } from "@/data/listings";
+import { Link } from "@tanstack/react-router";
 import { ShoppingBag } from "lucide-react";
 
 export function ListingCard({ listing }: { listing: Listing }) {
+  const isUuid = /^[0-9a-f-]{36}$/i.test(listing.id);
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    isUuid ? (
+      <Link to="/listings/$id" params={{ id: listing.id }} className="block group cursor-pointer">
+        {children}
+      </Link>
+    ) : (
+      <div className="group cursor-pointer">{children}</div>
+    );
+
   return (
-    <article className="group cursor-pointer">
+    <Wrapper>
+    <article>
       <div className="relative aspect-[3/4] mb-5 overflow-hidden rounded-[min(1vw,12px)] bg-card">
         <img
           src={listing.image}
@@ -60,5 +72,6 @@ export function ListingCard({ listing }: { listing: Listing }) {
         )}
       </div>
     </article>
+    </Wrapper>
   );
 }

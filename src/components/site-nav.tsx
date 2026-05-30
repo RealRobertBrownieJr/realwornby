@@ -15,6 +15,11 @@ export function SiteNav() {
           <Link to="/browse" className="hover:text-foreground transition-colors" activeProps={{ className: "text-foreground" }}>
             The Archive
           </Link>
+          {user && (
+            <Link to="/orders" className="hover:text-foreground transition-colors">
+              Orders
+            </Link>
+          )}
           <Link to="/verification" className="hover:text-foreground transition-colors">
             Verification
           </Link>
